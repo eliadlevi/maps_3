@@ -10,7 +10,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),  # Convert image to a tensor
 ])
 
-# Load pre-trained CLIPSeg model and processor with explicit resizing
+# Load pre-trained CLIPSeg model and processor
 processor = CLIPSegProcessor.from_pretrained(
     "CIDAS/clipseg-rd64-refined",
     size={"height": 224, "width": 224}  # Ensure processor resizes to 224x224
@@ -23,41 +23,40 @@ image = Image.open(image_path).convert("RGB")
 
 # Apply the transformations
 image_resized = transform(image)
-print(f"Transformed image shape: {image_resized.shape}")  # Shape should be [3, 224, 224]
-
-# Convert back to PIL image for processor
 image_resized_pil = transforms.ToPILImage()(image_resized)
 
-# Use the text prompt "sidewalk"
-text_prompt = ["pavement", "street walk", "pedestrian area", "sidewalk"]
+# Use a list of labels as text prompts
+text_prompts = ["pavement"]
 
-# Preprocess the input with explicit resizing in processor
-inputs = processor(text=text_prompt, images=image_resized_pil, return_tensors="pt")
-print(f"Processor output shape: {inputs['pixel_values'].shape}")  # Should be [1, 3, 224, 224]
+# Process the image and text prompts
+inputs = processor(text=text_prompts, images=image_resized_pil, return_tensors="pt", padding=True, truncation=True)
+
+# Check the shapes of processed inputs
+print(f"Processor pixel_values shape: {inputs['pixel_values'].shape}")  # Should be [1, 3, 224, 224]
+print(f"Processor input_ids shape: {inputs['input_ids'].shape}")  # Should match the number of text prompts
 
 # Perform inference
 with torch.no_grad():
     outputs = model(**inputs)
-    segmentation = torch.sigmoid(outputs.logits)
+    segmentation_maps = torch.sigmoid(outputs.logits)  # Shape: [num_prompts, 1, H, W]
 
-# Resize segmentation mask back to the original image size for visualization
-segmentation = segmentation[0][0].cpu().numpy()
-segmentation_resized = Image.fromarray((segmentation * 255).astype('uint8')).resize(image.size)
+# Display results for each label
+plt.figure(figsize=(15, 10))
 
-# Display results
-plt.figure(figsize=(12, 6))
+for i, (prompt, segmentation) in enumerate(zip(text_prompts, segmentation_maps)):
+    segmentation = segmentation[0].cpu().numpy()
+    threshold = 0.5  # Apply a threshold to binarize
+    segmentation_binary = (segmentation > threshold).astype("uint8")
+    
+    # Resize segmentation mask back to original image size
+    segmentation_resized = Image.fromarray((segmentation_binary * 255).astype("uint8")).resize(image.size)
 
-# Original Image
-plt.subplot(1, 2, 1)
-plt.title("Original Image")
-plt.imshow(image)
-plt.axis("off")
+    # Plot results
+    plt.subplot(2, 2, i + 1)
+    plt.title(f"Prompt: {prompt}")
+    plt.imshow(image)
+    plt.imshow(segmentation_resized, alpha=0.6, cmap="jet")
+    plt.axis("off")
 
-# Segmentation Mask
-plt.subplot(1, 2, 2)
-plt.title("Segmentation: Sidewalk")
-plt.imshow(image)
-plt.imshow(segmentation_resized, alpha=0.6, cmap="jet")  # Overlay mask
-plt.axis("off")
-
+plt.tight_layout()
 plt.show()
