@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'image_processing = maps3_photo_processor.service_run:main',  # Maps the 'image_publisher' command to service_run.py's main()
         ],
     },
 )
