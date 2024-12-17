@@ -1,38 +1,38 @@
 import torch
 from transformers import CLIPSegProcessor, CLIPSegForImageSegmentation
 import torch.nn.functional as F
-# class ClipSegImageProcessing:
 from transformers import CLIPSegProcessor, CLIPSegForImageSegmentation
 import torch
 
-def segment_with_labels(image, labels):
-    # Load the CLIPSeg processor and model
-    processor = CLIPSegProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
-    model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
+class ClipSegImageProcessing:
+    def segment_with_labels(image, labels):
+        # Load the CLIPSeg processor and model
+        processor = CLIPSegProcessor.from_pretrained("CIDAS/clipseg-rd64-refined")
+        model = CLIPSegForImageSegmentation.from_pretrained("CIDAS/clipseg-rd64-refined")
 
-    # Preprocess the resized image and text prompts
-    inputs = processor(
-        text=labels,
-        images=[image] * len(labels),  # Duplicate the image for each label
-        return_tensors="pt",
-    )
+        # Preprocess the resized image and text prompts
+        inputs = processor(
+            text=labels,
+            images=[image] * len(labels),  # Duplicate the image for each label
+            return_tensors="pt",
+        )
 
-    inputs['pixel_values'] = F.interpolate(
-        inputs['pixel_values'], size=(224, 224), mode="bilinear", align_corners=False
-    )
+        inputs['pixel_values'] = F.interpolate(
+            inputs['pixel_values'], size=(224, 224), mode="bilinear", align_corners=False
+        )
 
-    # Verify input tensor shape
-    print(f"Input tensor shape: {inputs['pixel_values'].shape}")  # Expect [batch_size, 3, 224, 224]
+        # Verify input tensor shape
+        print(f"Input tensor shape: {inputs['pixel_values'].shape}")  # Expect [batch_size, 3, 224, 224]
 
-    # Perform inference
-    with torch.no_grad():
-        outputs = model(**inputs)
+        # Perform inference
+        with torch.no_grad():
+            outputs = model(**inputs)
 
-    # Extract segmentation masks
-    segmentation_masks = outputs.logits.sigmoid().cpu().numpy()  # Shape: [num_labels, H, W]
-    print(f"Segmentation masks shape: {segmentation_masks.shape}")
+        # Extract segmentation masks
+        segmentation_masks = outputs.logits.sigmoid().cpu().numpy()  # Shape: [num_labels, H, W]
+        print(f"Segmentation masks shape: {segmentation_masks.shape}")
 
-    return segmentation_masks
+        return segmentation_masks
 
 # def display_results(labels, masks):
 #     image_path = "/home/jellylapubuntu/python/maps_3/cityscapes/leftImg8bit/leftImg8bit/train/aachen/aachen_000035_000019_leftImg8bit.png"
