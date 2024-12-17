@@ -9,47 +9,39 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
-from std_msgs.msg import Int32MultiArray
+from std_msgs.msg import Float32MultiArray
+from shared_interfaces.msg import SegmentationMask
+from PIL import Image as PILImage
 
 class AlgoMapper(Node):
     def __init__(self):
         super().__init__("AlgoMapper")
-        self.subscription = self.create_subscription(Int32MultiArray, 'processed_image_topic', self.segmentation_callback, 10)
+        self.subscription = self.create_subscription(SegmentationMask, 'processed_image_topic', self.segmentation_callback, 10)
         self.get_logger().info("AlgoMapper Node Initialized")
 
-
-    # def algo_result_mapper(self, msg):
-    #     try:
-    #         self.get_logger().info('Received algo.')
-
-    #         # Visualize the numeric segmentation mask over the original image
-    #         plt.figure(figsize=(15, 10))
-    #         # plt.imshow(image, alpha=0.8)  # Original image with some transparency
-    #         plt.imshow(msg, alpha=0.5, cmap="tab20")  # Segmentation overlay with colormap
-    #         plt.colorbar(label="Class Index")  # Color bar for numeric class representation
-    #         plt.axis("off")
-    #         plt.title("Segmentation Mask (Numeric Overlay)")
-    #         plt.show()
-
-
-    #     except Exception as e:
-    #         self.get_logger().error(f'Failed to process image: {e}')
-
     def segmentation_callback(self, msg):
-            try:
-                # Reconstruct 2D array from the flattened array
-                height = msg.layout.dim[0].size
-                width = msg.layout.dim[1].size
-                segmentation = np.array(msg.data, dtype=np.int32).reshape((height, width))
+        self.get_logger().info("Segmentation received")
 
-                # Display the segmentation result using OpenCV
-                # Optional: Apply colormap for better visualization
-                color_segmentation = cv2.applyColorMap((segmentation * 10).astype(np.uint8), cv2.COLORMAP_JET)
-                cv2.imshow('Segmentation Result', color_segmentation)
-                cv2.waitKey(1)
-                self.get_logger().info('Displayed segmentation result.')
-            except Exception as e:
-                self.get_logger().error(f'Failed to process segmentation: {e}')
+        # Extract message data
+        height, width, num_labels = msg.height, msg.width, msg.num_labels
+        segmentation_masks = np.array(msg.data, dtype=np.float32).reshape((num_labels, height, width))
+        self.get_logger().info("Segmentation masks reshaped")
 
+        # Combine all masks into a single mask using argmax
+        combined_mask = np.argmax(segmentation_masks, axis=0)  # Shape: (height, width)
+
+        # Load the original image
+        image_path = "/home/jellylapubuntu/python/maps_3/cityscapes/leftImg8bit/leftImg8bit/train/aachen/aachen_000035_000019_leftImg8bit.png"
+        image = PILImage.open(image_path).convert("RGB")
+        original_width, original_height = image.size  # Get original image size
         
+        resized_mask = cv2.resize(combined_mask, (original_width, original_height), interpolation=cv2.INTER_NEAREST)
 
+        # Display the combined segmentation mask over the original image
+        plt.figure(figsize=(15, 10))
+        plt.imshow(image, alpha=0.8)  # Original image with transparency
+        plt.imshow(resized_mask, alpha=0.5, cmap="tab20")  # Combined segmentation mask overlay
+        plt.colorbar(label="Class Index")  # Color bar showing class indices
+        plt.axis("off")
+        plt.title("Combined Segmentation Mask")
+        plt.show()
