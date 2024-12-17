@@ -21,7 +21,7 @@ class ImageProcessing(Node):
             # Convert the ROS Image message to an OpenCV image
             cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
             self.get_logger().info('Received image.')
-            labels, segmentation_masks = ClipSegImageProcessing.segment_with_labels(cv_image, labels)
+            segmentation_masks = ClipSegImageProcessing.segment_with_labels(cv_image, labels)
 
             num_labels, height, width = segmentation_masks.shape  # Extract dimensions
             flattened_mask = segmentation_masks.flatten().tolist()
@@ -35,8 +35,6 @@ class ImageProcessing(Node):
             self.publisher_.publish(outputMassage)
             self.get_logger().info("Published an algo results")
             
-            self.visuallize(labels, segmentation_masks)
-
         except Exception as e:
             self.get_logger().error(f'Failed to process image: {e}')
  
