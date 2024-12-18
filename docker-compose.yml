@@ -7,7 +7,7 @@ services:
       dockerfile: image_mapper.Dockerfile     
 
     container_name: maps3_image_mapper
-    network_mode: "host"      # Use host networking for ROS 2 DDS
+    network_mode: host      # Use host networking for ROS 2 DDS
     environment:
       - ROS_DOMAIN_ID=1       # Use the same domain ID for all nodes
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -19,7 +19,7 @@ services:
       dockerfile: maps3_image_sender.Dockerfile        
     
     container_name: maps3_image_sender
-    network_mode: "host"      # Use host networking
+    network_mode: host      # Use host networking
     environment:
       - ROS_DOMAIN_ID=1
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
@@ -31,21 +31,21 @@ services:
       dockerfile: maps3_photo_processor.Dockerfile        
     
     container_name: maps3_photo_processor
-    network_mode: "host"      # Use host networking
+    network_mode: host      # Use host networking
     environment:
       - ROS_DOMAIN_ID=1
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     restart: always
 
-  # rqt:
-  #   image: osrf/ros:humble-desktop
-  #   network_mode: host
-  #   environment:
-  #     - ROS_DOMAIN_ID=1
-  #     - DISPLAY=$DISPLAY
-  #     - QT_X11_NO_MITSHM=1
-  #   volumes:
-  #     - /tmp/.X11-unix:/tmp/.X11-unix
-  #   command: >
-  #     /bin/bash -c "source /opt/ros/humble/setup.bash &&
-  #                   rqt"
+  rqt:
+    image: osrf/ros:humble-desktop
+    network_mode: host
+    environment:
+      - ROS_DOMAIN_ID=1
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: >
+      /bin/bash -c "source /opt/ros/humble/setup.bash &&
+                    rqt"
