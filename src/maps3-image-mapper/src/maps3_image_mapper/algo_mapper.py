@@ -1,15 +1,7 @@
-from transformers import SegformerFeatureExtractor, SegformerForSemanticSegmentation
-import torch
-from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
-from sensor_msgs.msg import Image
-import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
 import cv2
-from std_msgs.msg import Float32MultiArray
 from shared_interfaces.msg import SegmentationMask
 from PIL import Image as PILImage
 
@@ -31,7 +23,7 @@ class AlgoMapper(Node):
         combined_mask = np.argmax(segmentation_masks, axis=0)  # Shape: (height, width)
 
         # Load the original image
-        image_path = "/home/jellylapubuntu/python/maps_3/cityscapes/leftImg8bit/leftImg8bit/train/aachen/aachen_000035_000019_leftImg8bit.png"
+        image_path = "../../resource/aachen_000157_000019_leftImg8bit.png"
         image = PILImage.open(image_path).convert("RGB")
         original_width, original_height = image.size  # Get original image size
         

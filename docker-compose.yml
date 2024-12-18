@@ -2,8 +2,11 @@ version: '3.8'
 
 services:
   maps3_image_mapper:
-    build: ./src/maps3-image-mapper/Dockerfile           # Path to Node 1's Dockerfile
-    container_name: ros2_node_1
+    build: 
+      context: .  # Relative path to the Dockerfile directory
+      dockerfile: image_mapper.Dockerfile     
+
+    container_name: maps3_image_mapper
     network_mode: "host"      # Use host networking for ROS 2 DDS
     environment:
       - ROS_DOMAIN_ID=1       # Use the same domain ID for all nodes
@@ -11,8 +14,11 @@ services:
     restart: always           # Restart on failure
 
   maps3_image_sender:
-    build: ./src/maps3-image-sender/Dockerfile
-    container_name: ros2_node_2
+    build: 
+      context: .  # Relative path to the Dockerfile directory
+      dockerfile: maps3_image_sender.Dockerfile        
+    
+    container_name: maps3_image_sender
     network_mode: "host"      # Use host networking
     environment:
       - ROS_DOMAIN_ID=1
@@ -20,8 +26,11 @@ services:
     restart: always
   
   maps3_photo_processor:
-    build: ./src/maps3-photo-processor/Dockerfile
-    container_name: ros2_node_2
+    build: 
+      context: .  # Relative path to the Dockerfile directory
+      dockerfile: maps3_photo_processor.Dockerfile        
+    
+    container_name: maps3_photo_processor
     network_mode: "host"      # Use host networking
     environment:
       - ROS_DOMAIN_ID=1

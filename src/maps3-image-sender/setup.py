@@ -4,15 +4,14 @@ package_name = 'maps3-image-sender'
 
 setup(
     name=package_name,
-    version='0.0.0',
-    packages=find_packages(exclude=['test']),
+    version='0.1.0',
+    packages=[package_name.replace('-', '_')],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools'],
-    zip_safe=True,
+    package_dir={'': 'src'},  # Map the package to 'src/'
     maintainer='jellylapubuntu',
     maintainer_email='eliadwork16@gmail.com',
     description='TODO: Package description',
