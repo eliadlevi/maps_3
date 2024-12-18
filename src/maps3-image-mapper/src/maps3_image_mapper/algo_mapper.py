@@ -4,11 +4,20 @@ from rclpy.node import Node
 import cv2
 from shared_interfaces.msg import SegmentationMask
 from PIL import Image as PILImage
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
+
 
 class AlgoMapper(Node):
     def __init__(self):
         super().__init__("AlgoMapper")
-        self.subscription = self.create_subscription(SegmentationMask, 'processed_image_topic', self.segmentation_callback, 10)
+
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.VOLATILE,
+            depth=10,
+        )
+
+        self.subscription = self.create_subscription(SegmentationMask, 'processed_image_topic', self.segmentation_callback, qos)
         self.get_logger().info("AlgoMapper Node Initialized")
 
     def segmentation_callback(self, msg):

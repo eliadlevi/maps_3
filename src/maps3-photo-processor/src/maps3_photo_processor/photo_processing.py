@@ -3,13 +3,19 @@ from rclpy.node import Node
 from cv_bridge import CvBridge
 from .clip_seg import ClipSegImageProcessing
 from shared_interfaces.msg import SegmentationMask
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 
 class ImageProcessing(Node):
     def __init__(self):
         super().__init__("ImageProcessing")
-        self.subscription = self.create_subscription(Image, 'image_topic', self.image_callback, 10)
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.VOLATILE,
+            depth=10,
+        )
+        self.subscription = self.create_subscription(Image, 'image_topic', self.image_callback, qos)
         self.get_logger().info("ImageProcessing Node Initialized")
-        self.publisher_ = self.create_publisher(SegmentationMask, 'processed_image_topic', 10)
+        self.publisher_ = self.create_publisher(SegmentationMask, 'processed_image_topic', qos)
         self.bridge = CvBridge()
 
     def image_callback(self, msg):

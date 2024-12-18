@@ -2,12 +2,18 @@ from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
-import os
+from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 
 class ImagePublisher(Node):
     def __init__(self):
         super().__init__('ImagePublisher')
-        self.publisher = self.create_publisher(Image, 'image_topic', 10)
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.VOLATILE,
+            depth=10,
+        )
+        
+        self.publisher = self.create_publisher(Image, 'image_topic', qos)
         self.timer = self.create_timer(5.0, self.publish_image)  # Publish every 30 second
         self.bridge = CvBridge()
         self.image_path = './src/maps3-image-sender/resource/aachen_000157_000019_leftImg8bit.png'
