@@ -23,7 +23,7 @@ class AlgoMapper(Node):
         combined_mask = np.argmax(segmentation_masks, axis=0)  # Shape: (height, width)
 
         # Load the original image
-        image_path = "../../resource/aachen_000157_000019_leftImg8bit.png"
+        image_path = './src/maps3-image-sender/resource/aachen_000157_000019_leftImg8bit.png'
         image = PILImage.open(image_path).convert("RGB")
         original_width, original_height = image.size  # Get original image size
         

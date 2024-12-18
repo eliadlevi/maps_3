@@ -12,7 +12,7 @@ WORKDIR /ros2_ws
 COPY src/shared_interfaces src/shared_interfaces
 
 # Copy only the maps3-image-mapper package
-COPY src/maps3-image-mapper src/maps3-image-sender
+COPY src/maps3-image-sender src/maps3-image-sender
     
 RUN . /opt/ros/humble/setup.sh && colcon build
 
@@ -22,4 +22,4 @@ RUN echo "source /ros2_ws/install/setup.bash" >> ~/.bashrc
 SHELL ["/bin/bash", "-c"]
 
 # Run the ROS 2 node
-CMD ["ros2", "run", "maps3-image-sender", "image_sender"]
+CMD ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && ros2 run maps3-image-sender image_sender"]

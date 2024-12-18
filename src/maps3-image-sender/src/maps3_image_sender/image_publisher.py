@@ -1,16 +1,16 @@
-import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import cv2
+import os
 
 class ImagePublisher(Node):
     def __init__(self):
         super().__init__('ImagePublisher')
         self.publisher = self.create_publisher(Image, 'image_topic', 10)
-        self.timer = self.create_timer(30.0, self.publish_image)  # Publish every 30 second
+        self.timer = self.create_timer(5.0, self.publish_image)  # Publish every 30 second
         self.bridge = CvBridge()
-        self.image_path = '/home/jellylapubuntu/python/maps_3/cityscapes/leftImg8bit/leftImg8bit/train/bochum/bochum_000000_000313_leftImg8bit.png'  # Path to the image
+        self.image_path = './src/maps3-image-sender/resource/aachen_000157_000019_leftImg8bit.png'
         self.get_logger().info('ImagePublisher Node started.')
 
     def publish_image(self):

@@ -23,4 +23,4 @@ RUN echo "source /ros2_ws/install/setup.bash" >> ~/.bashrc
 SHELL ["/bin/bash", "-c"]
 
 # Run the ROS 2 node
-CMD ["ros2", "run", "maps3-image-mapper", "image_mapper"]
+CMD ["/bin/bash", "-c", "source /opt/ros/humble/setup.bash && source /ros2_ws/install/setup.bash && ros2 run maps3-image-mapper image_mapper"]

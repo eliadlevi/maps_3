@@ -13,6 +13,7 @@ class ImageProcessing(Node):
         self.bridge = CvBridge()
 
     def image_callback(self, msg):
+        self.get_logger().info("Got an image to process")
 
         labels = ["sidewalk", "road", "building","sky"]  # List of labels to detect
 
@@ -25,6 +26,7 @@ class ImageProcessing(Node):
 
             num_labels, height, width = segmentation_masks.shape  # Extract dimensions
             flattened_mask = segmentation_masks.flatten().tolist()
+            self.get_logger().info("algo finished running")
 
             outputMassage = SegmentationMask()
             outputMassage.height = height
