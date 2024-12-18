@@ -36,3 +36,16 @@ services:
       - ROS_DOMAIN_ID=1
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     restart: always
+
+  # rqt:
+  #   image: osrf/ros:humble-desktop
+  #   network_mode: host
+  #   environment:
+  #     - ROS_DOMAIN_ID=1
+  #     - DISPLAY=$DISPLAY
+  #     - QT_X11_NO_MITSHM=1
+  #   volumes:
+  #     - /tmp/.X11-unix:/tmp/.X11-unix
+  #   command: >
+  #     /bin/bash -c "source /opt/ros/humble/setup.bash &&
+  #                   rqt"
