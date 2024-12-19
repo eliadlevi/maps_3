@@ -12,6 +12,11 @@ services:
       - ROS_DOMAIN_ID=1       # Use the same domain ID for all nodes
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     restart: always           # Restart on failure
+    volumes:
+      - /dev/shm:/dev/shm  # Mount shared memory
+    stdin_open: true      # Keep STDIN open for interactive mode
+    tty: true             # Allocate a pseudo-TTY for interactive mode
+
 
   maps3_image_sender:
     build: 
@@ -24,6 +29,10 @@ services:
       - ROS_DOMAIN_ID=1
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     restart: always
+    volumes:
+      - /dev/shm:/dev/shm  # Mount shared memory
+    stdin_open: true      # Keep STDIN open for interactive mode
+    tty: true             # Allocate a pseudo-TTY for interactive mode
   
   maps3_photo_processor:
     build: 
@@ -36,6 +45,10 @@ services:
       - ROS_DOMAIN_ID=1
       - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
     restart: always
+    volumes:
+      - /dev/shm:/dev/shm  # Mount shared memory
+    stdin_open: true      # Keep STDIN open for interactive mode
+    tty: true             # Allocate a pseudo-TTY for interactive mode
 
   rqt:
     image: osrf/ros:humble-desktop
@@ -46,6 +59,9 @@ services:
       - QT_X11_NO_MITSHM=1
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - /dev/shm:/dev/shm  # Mount shared memory
     command: >
       /bin/bash -c "source /opt/ros/humble/setup.bash &&
                     rqt"
+    stdin_open: true      # Keep STDIN open for interactive mode
+    tty: true             # Allocate a pseudo-TTY for interactive mode
