@@ -71,3 +71,4 @@ class ClipSegImageProcessing:
 #     # Display the results
 #     display_results(labels, segmentation_masks)
 
+# TODO: cleanup the code
